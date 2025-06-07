@@ -4,12 +4,13 @@ from sqlalchemy.ext.declarative import declarative_base
 
 Base = declarative_base()
 
+
 class User(Base):
     __tablename__ = 'users'
     id = Column(Integer, primary_key=True, index=True)
     username = Column(String, index=True, unique=True)
     password = Column(String)
-    portfolio = relationship('Portfolio', back_populates='user', uselist=False) 
+    portfolio = relationship('Portfolio', back_populates='user', uselist=False)
 
 
 class Portfolio(Base):
@@ -20,8 +21,8 @@ class Portfolio(Base):
     available_money = Column(Float, default=0)
 
     user = relationship('User', back_populates='portfolio')
-    assets = relationship('Asset',back_populates='portfolio') 
-    transactions = relationship('Transaction',back_populates='portfolio') 
+    assets = relationship('Asset', back_populates='portfolio')
+    transactions = relationship('Transaction', back_populates='portfolio')
 
 
 class Asset(Base):
