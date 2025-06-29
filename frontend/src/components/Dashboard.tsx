@@ -92,6 +92,8 @@ const Dashboard = () => {
       setSellSymbol('');
       setSellQuantity('');
       setSuccess(response.data.message);
+      console.log(response.data.message);
+
     } catch (err: unknown) {
       setError(parseError(err, 'Failed to sell asset'))
       setShowSellModal(false);
@@ -350,7 +352,7 @@ const Dashboard = () => {
             <h3 className="text-2xl font-bold text-white mb-6">Sell Asset</h3>
             <form onSubmit={handleSell}>
               <div className="mb-4">
-                <select value={buySymbol} onChange={(e) => setBuySymbol(e.target.value)} className="mt-2 block w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select value={buySymbol} onChange={(e) => setSellSymbol(e.target.value)} className="mt-2 block w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option value="">Select Asset</option>
                   <option value="BTC">Bitcoin (BTC)</option>
                   <option value="ETH">Ethereum (ETH)</option>
