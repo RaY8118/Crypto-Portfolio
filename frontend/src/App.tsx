@@ -4,6 +4,8 @@ import Login from './components/Login';
 import Dashboard from './components/Dashboard';
 import LandingPage from './components/LandingPage';
 import { AuthProvider, useAuth } from './context/AuthContext'
+import { ToastContainer } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css';
 import './App.css'
 
 function AppRoutes() {
@@ -30,6 +32,7 @@ function App() {
       <Router>
         <AppRoutes />
       </Router>
+      <ToastContainer position='top-center' autoClose={3000} />
     </AuthProvider >
   )
 }

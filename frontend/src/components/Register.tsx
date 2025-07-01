@@ -2,12 +2,12 @@ import { useState } from "react";
 import type { FormEvent } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { register } from "../services/api";
+import { toast } from "react-toastify";
 
 const Register = () => {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
@@ -15,17 +15,17 @@ const Register = () => {
     e.preventDefault();
 
     if (password != confirmPassword) {
-      setError("Password do not match");
+      toast.error("Password do not match")
       return;
     }
 
     try {
-      setError("");
       setLoading(true);
       await register({ username, password });
+      toast.success("Registration successful! Please log in.")
       navigate("/login");
     } catch (error: any) {
-      setError(error.response?.data?.detail || "Failed to register");
+      toast.error(error.response?.data?.detail || "Failed to register")
     }
     finally {
       setLoading(false);
@@ -51,12 +51,6 @@ const Register = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-900 bg-opacity-30 p-4 mb-4">
-              <div className="text-sm text-red-300">{error}</div>
-            </div>
-          )}
-
           <div className="space-y-4">
             <div>
               <label htmlFor="username" className="sr-only">Username</label>

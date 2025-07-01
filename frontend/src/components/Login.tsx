@@ -3,11 +3,11 @@ import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { login } from '../services/api';
 import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const { login: authLogin } = useAuth();
@@ -16,13 +16,13 @@ const Login = () => {
     e.preventDefault();
 
     try {
-      setError('');
       setLoading(true);
       await login(username, password);
       authLogin();
+      toast.success('Login successful')
       navigate('/dashboard');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Invalid username or password');
+      toast.error(err.response?.data?.detail || 'Invalid username or password')
     } finally {
       setLoading(false);
     }
@@ -47,11 +47,7 @@ const Login = () => {
         </div>
 
         <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-          {error && (
-            <div className="rounded-md bg-red-900 bg-opacity-30 p-4 mb-4">
-              <div className="text-sm text-red-300">{error}</div>
-            </div>
-          )}
+
 
           <div className="space-y-4">
             <div>

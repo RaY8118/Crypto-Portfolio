@@ -4,14 +4,13 @@ import { getPortfolio, buyAsset, sellAsset, addMoney, withdrawMoney } from '../s
 import type { Portfolio, Asset } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
+import { toast } from 'react-toastify'
 
 const Dashboard = () => {
   const navigate = useNavigate();
   const { logout: authLogout } = useAuth();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
   const [loading, setLoading] = useState(true);
-  const [success, setSuccess] = useState('');
-  const [error, setError] = useState('');
 
   // Transaction states
   const [buySymbol, setBuySymbol] = useState('');
@@ -37,9 +36,8 @@ const Dashboard = () => {
       setLoading(true);
       const response = await getPortfolio();
       setPortfolio(response.data);
-      setError('');
     } catch (err: unknown) {
-      setError('Failed to load portfolio data');
+      toast.error(parseError(err, 'Failed to load portfolio data'))
       console.error(err);
     } finally {
       setLoading(false);
@@ -61,8 +59,6 @@ const Dashboard = () => {
   const handleBuy = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!buySymbol || !buyQuantity) return;
-    setError('');
-
     try {
       setTransactionLoading(true);
       const response = await buyAsset(buySymbol.toUpperCase(), Number(buyQuantity));
@@ -70,9 +66,9 @@ const Dashboard = () => {
       setShowBuyModal(false);
       setBuySymbol('');
       setBuyQuantity('');
-      setSuccess(response.data.message);
+      toast.success(response.data.message)
     } catch (err: unknown) {
-      setError(parseError(err, 'Failed to buy asset'));
+      toast.error(parseError(err, 'Failed to buy asset'))
       setShowBuyModal(false);
     } finally {
       setTransactionLoading(false);
@@ -82,7 +78,6 @@ const Dashboard = () => {
   const handleSell = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!sellSymbol || !sellQuantity) return;
-    setError('');
 
     try {
       setTransactionLoading(true);
@@ -91,11 +86,10 @@ const Dashboard = () => {
       setShowSellModal(false);
       setSellSymbol('');
       setSellQuantity('');
-      setSuccess(response.data.message);
-      console.log(response.data.message);
+      toast.success(response.data.message)
 
     } catch (err: unknown) {
-      setError(parseError(err, 'Failed to sell asset'))
+      toast.error(parseError(err, 'Failed to sell asset'))
       setShowSellModal(false);
     } finally {
       setTransactionLoading(false);
@@ -105,7 +99,6 @@ const Dashboard = () => {
   const handleAddMoney = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!addMoneyAmount) return;
-    setError('');
 
     try {
       setTransactionLoading(true);
@@ -113,9 +106,9 @@ const Dashboard = () => {
       await fetchPortfolio();
       setShowAddMoneyModal(false);
       setAddMoneyAmount('');
-      setSuccess(response.data.message);
+      toast.success(response.data.message)
     } catch (err: unknown) {
-      setError(parseError(err, 'Failed to add money'));
+      toast.error(parseError(err, 'Failed to add money'))
       setShowAddMoneyModal(false);
     } finally {
       setTransactionLoading(false);
@@ -125,7 +118,6 @@ const Dashboard = () => {
   const handleWithdrawMoney = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!withdrawMoneyAmount) return;
-    setError('');
 
     try {
       setTransactionLoading(true);
@@ -133,9 +125,9 @@ const Dashboard = () => {
       await fetchPortfolio();
       setShowWithdrawMoneyModal(false);
       setwithdrawMoneyAmount('');
-      setSuccess(response.data.message);
+      toast.success(response.data.message)
     } catch (err: unknown) {
-      setError(parseError(err, 'Failed to withdraw money'));
+      toast.error(parseError(err, 'Failed to withdraw money'))
       setShowWithdrawMoneyModal(false);
     } finally {
       setTransactionLoading(false);
@@ -144,6 +136,7 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     authLogout();
+    toast.success('Logged out successfully')
     navigate('/login');
   };
 
@@ -183,16 +176,6 @@ const Dashboard = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {error && (
-          <div className="mb-6 rounded-md bg-red-900 bg-opacity-30 p-4">
-            <div className="text-sm text-red-300">{error}</div>
-          </div>
-        )}
-        {success && (
-          <div className="mb-6 rounded-md bg-green-900 bg-opacity-30 p-4">
-            <div className="text-sm text-green-300">{success}</div>
-          </div>
-        )}
         {portfolio && (
           <>
             {/* Portfolio Overview */}
@@ -352,7 +335,7 @@ const Dashboard = () => {
             <h3 className="text-2xl font-bold text-white mb-6">Sell Asset</h3>
             <form onSubmit={handleSell}>
               <div className="mb-4">
-                <select value={buySymbol} onChange={(e) => setSellSymbol(e.target.value)} className="mt-2 block w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
+                <select value={sellSymbol} onChange={(e) => setSellSymbol(e.target.value)} className="mt-2 block w-full px-4 py-2 border border-gray-700 rounded-md bg-gray-900 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500">
                   <option value="">Select Asset</option>
                   <option value="BTC">Bitcoin (BTC)</option>
                   <option value="ETH">Ethereum (ETH)</option>
