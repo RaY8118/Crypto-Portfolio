@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Float, ForeignKey, DateTime
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
+from datetime import datetime
+import pytz
 
 Base = declarative_base()
 
@@ -42,6 +44,7 @@ class Transaction(Base):
     symbol = Column(String)
     quantity = Column(Float)
     price = Column(Float)
-    timestamp = Column(DateTime)
+    timestamp = Column(DateTime(timezone=True),
+                       default=lambda: datetime.now(pytz.utc))
 
     portfolio = relationship('Portfolio', back_populates='transactions')

@@ -6,8 +6,10 @@ from utils.auth_utils import get_current_user
 from utils.price_utils import get_crypto_price
 from models import User, Asset, Portfolio, Transaction
 from schemas import AddMoney, TradeAsset
+import pytz
 
 router = APIRouter()
+utc_now = datetime.now(pytz.utc)
 
 
 @router.post('/add-money')
@@ -61,7 +63,7 @@ def buy_asset(trade: TradeAsset, user: User = Depends(get_current_user),
 
     transaction = Transaction(
         portfolio_id=portfolio.id, symbol=trade.symbol,
-        quantity=trade.quantity, price=price, timestamp=datetime.utcnow()
+        quantity=trade.quantity, price=price, timestamp=utc_now
     )
 
     db.add(transaction)
@@ -93,7 +95,7 @@ def sell_asset(trade: TradeAsset, user: User = Depends(get_current_user),
 
     transaction = Transaction(
         portfolio_id=portfolio.id, symbol=trade.symbol,
-        quantity=-trade.quantity, price=price, timestamp=datetime.utcnow()
+        quantity=-trade.quantity, price=price, timestamp=utc_now
     )
 
     db.add(transaction)
@@ -103,3 +105,17 @@ def sell_asset(trade: TradeAsset, user: User = Depends(get_current_user),
     db.commit()
 
     return {'message': 'Asset successfully sold.'}
+
+
+@router.get("/history")
+def get_history(user: User = Depends(get_current_user),
+                db: Session = Depends(get_db)):
+    portfolio = user.portfolio
+    transactions = db.query(Transaction).filter(
+        Transaction.portfolio_id == portfolio.id).all()
+
+    if not transactions:
+        raise HTTPException(
+            status_code=400, detail="No transactions history found")
+
+    return {'message': 'Successfully fetched history', 'transactions': transactions}
