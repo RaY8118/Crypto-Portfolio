@@ -3,22 +3,18 @@ import { Link } from 'react-router-dom';
 export const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-gray-900 to-gray-800 text-white flex flex-col items-center justify-center p-4">
-      <header className="absolute top-0 left-0 right-0 p-6 flex justify-between items-center">
-        <h1 className="text-3xl font-extrabold text-blue-400">CryptoFolio</h1>
-        <nav className="space-x-4">
-          <Link to="/login" className="text-lg font-medium text-gray-300 hover:text-blue-400 transition duration-300">Login</Link>
-          <Link to="/register" className="text-lg font-medium text-gray-300 hover:text-blue-400 transition duration-300">Register</Link>
-        </nav>
+      <header className="absolute top-0 left-0 right-0 p-6 flex flex-col sm:flex-row justify-between items-center">
+        <h1 className="text-3xl font-extrabold text-blue-400 mb-4 sm:mb-0">CryptoFolio</h1>
       </header>
 
-      <main className="flex flex-col items-center justify-center text-center z-10 mt-16">
-        <h2 className="text-6xl font-extrabold leading-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 animate-fade-in-up">
+      <main className="flex flex-col items-center justify-center text-center z-10 mt-16 px-4">
+        <h2 className="text-3xl md:text-5xl lg:text-6xl font-extrabold leading-tight mb-6 text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-purple-600 animate-fade-in-up">
           Your Ultimate Crypto Portfolio Manager
         </h2>
-        <p className="text-2xl mb-10 max-w-3xl text-gray-300 animate-fade-in-up animation-delay-200">
+        <p className="text-lg md:text-xl lg:text-2xl mb-10 max-w-3xl text-gray-300 animate-fade-in-up animation-delay-200">
           Track, analyze, and manage your digital assets with unparalleled ease and precision. Stay ahead in the crypto market.
         </p>
-        <div className="space-x-6 animate-fade-in-up animation-delay-400">
+        <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-6 animate-fade-in-up animation-delay-400">
           <Link to="/register" className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full text-xl shadow-lg transform hover:scale-105 transition duration-300 ease-in-out">
             Get Started
           </Link>

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getPortfolio, buyAsset, sellAsset, addMoney, withdrawMoney } from '../services/api';
-import type { Portfolio, Asset } from '../services/api';
+import { getPortfolio, buyAsset, sellAsset, addMoney, withdrawMoney, getHistory } from '../services/api';
+import type { Portfolio, Asset, HistoryEntry } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import axios from 'axios';
 import { toast } from 'react-toastify'
@@ -10,6 +10,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const { logout: authLogout } = useAuth();
   const [portfolio, setPortfolio] = useState<Portfolio | null>(null);
+  const [history, setHistory] = useState<HistoryEntry[]>();
   const [loading, setLoading] = useState(true);
 
   // Transaction states
@@ -29,6 +30,7 @@ const Dashboard = () => {
 
   useEffect(() => {
     fetchPortfolio();
+    fetchHistory()
   }, []);
 
   const fetchPortfolio = async () => {
@@ -43,6 +45,20 @@ const Dashboard = () => {
       setLoading(false);
     }
   };
+
+  const fetchHistory = async () => {
+    try {
+      setLoading(true);
+      const response = await getHistory();
+      setHistory(response.data.transactions);
+    } catch (err: unknown) {
+      toast.error(parseError(err, 'Failed to load history data'))
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   const parseError = (err: unknown, defaultMessage: string) => {
     if (axios.isAxiosError(err) && err.response) {
@@ -63,6 +79,7 @@ const Dashboard = () => {
       setTransactionLoading(true);
       const response = await buyAsset(buySymbol.toUpperCase(), Number(buyQuantity));
       await fetchPortfolio();
+      await fetchHistory();
       setShowBuyModal(false);
       setBuySymbol('');
       setBuyQuantity('');
@@ -83,6 +100,7 @@ const Dashboard = () => {
       setTransactionLoading(true);
       const response = await sellAsset(sellSymbol.toUpperCase(), Number(sellQuantity));
       await fetchPortfolio();
+      await fetchHistory();
       setShowSellModal(false);
       setSellSymbol('');
       setSellQuantity('');
@@ -164,7 +182,7 @@ const Dashboard = () => {
       {/* Header */}
       <header className="bg-gray-800 shadow-lg">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-blue-400">CryptoFolio Dashboard</h1>
+          <h1 className="text-3xl font-bold text-blue-400">Dashboard</h1>
           <button
             onClick={handleLogout}
             className="px-6 py-2 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition duration-300"
@@ -266,6 +284,48 @@ const Dashboard = () => {
                           </td>
                         </tr>
                       ))}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+
+            {/* History Table */}
+            <div className="bg-gray-800 rounded-xl shadow-xl overflow-hidden border border-gray-700 mt-8">
+              <h2 className="text-2xl font-semibold p-6 pb-4 text-white">Transaction History</h2>
+              {history?.length === 0 ? (
+                <div className="p-6 text-center text-gray-400 text-lg">
+                  No transaction history available.
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="min-w-full divide-y divide-gray-700">
+                    <thead className="bg-gray-700">
+                      <tr>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Timestamp</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Symbol</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Action</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Quantity</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Price</th>
+                        <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody className="bg-gray-800 divide-y divide-gray-700">
+                      {history?.map((entry, index) => {
+                        const action = entry.quantity >= 0 ? 'Buy' : 'Sell';
+                        const quantity = Math.abs(entry.quantity);
+                        const amount = quantity * entry.price;
+                        return (
+                          <tr key={index} className="hover:bg-gray-700 transition duration-150">
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-300">{new Date(entry.timestamp).toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-300">{entry.symbol || '-'}</td>
+                            <td className={`px-6 py-4 whitespace-nowrap ${entry.quantity >= 0 ? 'text-green-400' : 'text-red-400'}`}>{action}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-300">{quantity.toFixed(6)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-300">{formatCurrency(entry.price)}</td>
+                            <td className="px-6 py-4 whitespace-nowrap text-gray-300">{formatCurrency(amount)}</td>
+                          </tr>
+                        );
+                      })}
                     </tbody>
                   </table>
                 </div>

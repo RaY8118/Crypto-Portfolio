@@ -40,6 +40,19 @@ export interface Portfolio {
   assets: Asset[]
 }
 
+export interface HistoryEntry {
+  id: number;
+  portfolio_id: number;
+  price: number;
+  quantity: number;
+  symbol: string;
+  timestamp: string;
+}
+
+export interface GetHistoryResponse {
+  message: string;
+  transactions: HistoryEntry[];
+}
 const api = axios.create({
   baseURL: API_URL,
   headers: {
@@ -108,6 +121,10 @@ export const sellAsset = async (symbol: string, quantity: number) => {
 
 export const getPortfolio = async () => {
   return api.get<Portfolio>('/portfolio');
+}
+
+export const getHistory = async () => {
+  return api.get<GetHistoryResponse>('/trade/history');
 }
 
 export default {
