@@ -127,6 +127,10 @@ export const getHistory = async () => {
   return api.get<GetHistoryResponse>('/trade/history');
 }
 
+export const pingToBackend = () => {
+  return api.get('/auth/ping')
+}
+
 export default {
   register,
   login,

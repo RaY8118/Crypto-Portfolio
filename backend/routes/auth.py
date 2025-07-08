@@ -44,3 +44,8 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(),
                        SECRET_KEY, algorithm='HS256')
 
     return {'access_token': token, 'token_type': 'bearer'}
+
+
+@router.get('/ping')
+def ping():
+    return {'message': 'pong'}
